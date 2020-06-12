@@ -5,7 +5,7 @@
 Обертка на PHP7+ для работы с [REST API YCLIENTS v2.0](https://yclients.docs.apiary.io/) 
 c троттлингом запросов к API и логированием в файл.
 
-Данная библиотека является форком от [Yclients API wrapper](https://github.com/slowprog/yclients-api) со следующими изменениями: 
+Данная библиотека является форком [Yclients API wrapper](https://github.com/slowprog/yclients-api) со следующими изменениями: 
 
 - добавлен регулируемый троттлинг запросов к API;
 - добавлена отключаемая проверка SSL/TLS-сертификата сервера YCLIENTS;
@@ -14,9 +14,7 @@ c троттлингом запросов к API и логированием в 
 - изменен и дополнен тест сообщений об ошибках;
 - добавлены методы getSchedule(), getGroups();
 - изменен метод postHooks() в связи с изменениями в API;
-- добавлен метод getAll() для выгрузки всех сущностей заданного типа с использованием генератора.
-
-**Документация находится в процессе разработки**
+- добавлен метод getAll() для выгрузки всех сущностей одного типа с использованием генератора при обработке больших объемов данных.
 
 ## Содержание
 
@@ -59,14 +57,14 @@ c троттлингом запросов к API и логированием в 
 <a id="%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%BE%D0%B2-%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%B0"></a>
 ### Список методов класса
 
-- `__construct(string $tokenPartner = null)` Конструктор.
+- `__construct(string $tokenPartner = null)` Конструктор класса.
 
 <a id="%D0%90%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F"></a>
 #### Авторизация
 
 - `setTokenPartner(string $tokenPartner) :void` Устанавливает токен партнера.
 - `getTokenPartner() :string` Возвращает токен партнера.
-- `getAuth(string $login, string $password) :array` Выполняет авторизацию.
+- `getAuth(string $login, string $password) :array` Выполняет авторизацию и возвращает токен пользователя.
 
 <a id="%D0%9E%D0%BD%D0%BB%D0%B0%D0%B9%D0%BD-%D0%B7%D0%B0%D0%BF%D0%B8%D1%81%D1%8C"></a>
 #### Онлайн-запись
@@ -84,7 +82,7 @@ c троттлингом запросов к API и логированием в 
 - `postBookCode($companyId, $phone, $fullname = null) :array` Отправляет СМС код подтверждения номера телефона.
 - `postBookCheck($companyId, array $appointments): array` Проверяет параметры записи.
 - `postBookRecord($companyId, array $person, array $appointments, $code = null, array $notify = null, $comment = null, $apiId = null) :array`
-    Создат запись на сеанс.
+    Создает запись на сеанс.
 
 <a id="%D0%97%D0%B0%D0%BF%D0%B8%D1%81%D0%B8-%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8F"></a>
 #### Записи пользователя
@@ -104,15 +102,15 @@ c троттлингом запросов к API и логированием в 
 - `getCompanies($groupId = null, $active = null, $moderated = null, $forBooking = null, $my = null, $userToken = null) :array`
     Возвращает список компаний.
 - `postCompany(array $fields, $userToken) :array` Создает компанию.
-- `getCompany($id) :array` Получить компанию.
-- `putCompany($id, array $fields, $userToken) :array` Изменить компанию.
-- `deleteCompany($id) :array` Удалить компанию.
+- `getCompany($id) :array` Возвращает компанию.
+- `putCompany($id, array $fields, $userToken) :array` Изменяет компанию.
+- `deleteCompany($id) :array` Удаляет компанию.
 
 <a id="%D0%9A%D0%B0%D1%82%D0%B5%D0%B3%D0%BE%D1%80%D0%B8%D1%8F-%D1%83%D1%81%D0%BB%D1%83%D0%B3"></a>
 #### Категория услуг
 
 - `getServiceCategories($companyId, $categoryId = null, $staffId = null) :array` Возвращает список категорий услуг.
-- `postServiceCategories($companyId, $categoryId, $fields, $userToken) :array` Создать категорию услуг.
+- `postServiceCategories($companyId, $categoryId, $fields, $userToken) :array` Создает категорию услуг.
 - `getServiceCategory($companyId, $categoryId) :array` Возвращает категорию услуг.
 - `putServiceCategory($companyId, $categoryId, $fields, $userToken) :array` Изменяет категорию услуг.
 - `deleteServiceCategory($companyId, $categoryId, $userToken) :array` Удаляет категорию услуг.
@@ -148,7 +146,6 @@ c троттлингом запросов к API и логированием в 
 
 - `getRecords($companyId, $userToken, $page = null, $count = null, $staffId = null, $clientId = null, \DateTime $startDate = null, \DateTime $endDate = null, \DateTime $cStartDate = null, \DateTime $cEndDate = null, \DateTime $changedAfter = null, \DateTime $changedBefore = null) :array`
     Возвращает список записей.
-
 - `postRecords($companyId, $userToken, $staffId, $services, $client, \DateTime $datetime, $seanceLength, $saveIfBusy, $sendSms, $comment = null, $smsRemainHours = null, $emailRemainHours = null, $apiId = null, $attendance = null) :array`
     Создает новую запись.
 - `getRecord($companyId, $recordId, $userToken) :array` Возвращает запись.
@@ -202,15 +199,16 @@ c троттлингом запросов к API и логированием в 
 <a id="%D0%92%D1%81%D0%BF%D0%BE%D0%BC%D0%BE%D0%B3%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D1%8B"></a>
 #### Вспомогательные методы
 
-- `getAll($callback) :\Generator` Загружает все сущности заданного типа.
-    + `$callback` - анонимная функция для загрузки сущностей `function(int $page, int $count)`:
-        * `$page` - номер страницы;
-        * `$count` - максимальное количество сущностей на странице.
+- `getAll($callback) :\Generator` Загружает все сущности одного типа.
+    + `$callback` - анонимная функция `function(int $page, int $count) { ... }`, реализующая постараничную загрузку сущностей
+       с помощью методов `getClients()` или `getRecords()`:
+        * `$page` - номер загружаемой страницы;
+        * `$count` - максимальное количество сущностей, загружаемых на странице.
 
 <a id="%D0%94%D0%BE%D0%BF%D0%BE%D0%BB%D0%BD%D0%B8%D1%82%D0%B5%D0%BB%D1%8C%D0%BD%D1%8B%D0%B5-%D0%BF%D0%B0%D1%80%D0%B0%D0%BC%D0%B5%D1%82%D1%80%D1%8B"></a>
 ### Дополнительные параметры
 
-Дополнительные параметры работы доступны через публичные свойства класса `YclientsApi`.
+Дополнительные параметры работы устанавливаются через публичные свойства класса `YclientsApi`.
 
 Свойство                | По умолчанию   | Описание
 ----------------------- | -------------- | --------
@@ -220,7 +218,7 @@ c троттлингом запросов к API и логированием в 
 `$verifySSLCerfificate` | true           | Включает проверку SSL/TLS-сертификата сервера YCLIENTS
 `$SSLCertificateFile`   | 'cacert.pem'   | Устанавливает файл SSL/TLS-сертификатов X.509 корневых удостоверяющих центров (CA) в формате РЕМ (null - файл, указанный в `curl.cainfo` php.ini)
 `$curlTimeout`          | 30             | Устанавливает таймаут соединения с сервером YCLIENTS, секунды
-`$limitCount`           | 300            | Максимальное количество сушностей, загружаемых на один запрос в методе `getAll()`
+`$limitCount`           | 300            | Максимальное количество сушностей, загружаемых за один запрос к API в методе `getAll()`
 
 <a id="%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B"></a>
 ### Примеры
