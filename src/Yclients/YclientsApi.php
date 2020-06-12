@@ -1,4 +1,39 @@
 <?php
+/**
+ * Yclients API PHP wrapper
+ *
+ * Original author: Andrey Tyshev
+ * @author Andrey Tyshev (slowprog)
+ * @see https://github.com/slowprog/yclients-api
+ * @copyright 2018 Andrey Tyshev
+ * @license MIT
+ *
+ * @author    andrey-tech
+ * @copyright 2019-2020 andrey-tech
+ * @see https://github.com/andrey-tech/amocrm-api-php
+ * @license MIT
+ *
+ * @version 1.5.0
+ *
+ * v0.1.0 (27.05.2019) Оригинальная версия от Andrey Tyshev
+ * v1.0.0 (27.05.2019) Добавлено:
+ *                     троттлинг обращений к API,
+ *                     проверка SSL-сертификата сервера,
+ *                     проверка сообщений об ошибках в ответе сервера,
+ *                     вывод отладочной информации
+ * v1.1.0 (09.08.2019) Добавлен вывод параметров запроса при ошибке
+ * v1.2.0 (13.09.2019) Добавлен метод getSchedule()
+ * v1.3.0 (21.02.2020) Добавлена проверка поля success: false в ответе сервера
+ * v1.3.1 (31.03.2020) Исправлен метод postHooks() в связи с изменениями в API YClients
+ * v1.4.0 (03.05.2020) Добавлен метод getGroups()
+ * v1.4.1 (24.05.2020) Исправлен метод throttleCurl().
+ *                     Параметр $throttle теперь число запросов в секунду.
+ *                     Улучшены отладочные сообщения
+ * v1.5.0 (12.06.2020) Добавлено логирование в файл или STDOUT
+ *
+ */
+
+declare(strict_types = 1);
 
 namespace Yclients;
 
@@ -7,17 +42,19 @@ namespace Yclients;
  */
 class YclientsApi
 {
+    use YclientsRequest;
+
     /*
      * URL для RestAPI
      */
     const URL = 'https://api.yclients.com/api/v1';
 
     /*
-     * Методы используемые в API
+     * Методы, используемые в API
      */
-    const METHOD_GET = 'GET';
-    const METHOD_POST = 'POST';
-    const METHOD_PUT = 'PUT';
+    const METHOD_GET    = 'GET';
+    const METHOD_POST   = 'POST';
+    const METHOD_PUT    = 'PUT';
     const METHOD_DELETE = 'DELETE';
 
     /**
@@ -26,7 +63,7 @@ class YclientsApi
      * @var string
      * @access private
      */
-    private $tokenPartner;
+    protected $tokenPartner;
 
     /**
      * @param string $tokenPartner
@@ -452,11 +489,11 @@ class YclientsApi
     public function getUserRecords($recordId, $recordHash = null, $userToken = null)
     {
         if (!$recordHash && !$userToken) {
-            trigger_error('getUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
+            throw new YclientsException('getUserRecords() требует обязательный 2-ой или 3-й аргумент');
+            // trigger_error('getUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
         }
 
-        return $this->request('user/records/' . $recordId . '/' . $recordHash, [], self::METHOD_GET,
-            $userToken ?: true);
+        return $this->request('user/records/' . $recordId . '/' . $recordHash, [], self::METHOD_GET, $userToken ?: true);
     }
 
     /**
@@ -475,11 +512,24 @@ class YclientsApi
     public function deleteUserRecords($recordId, $recordHash = null, $userToken = null)
     {
         if (!$recordHash && !$userToken) {
-            trigger_error('deleteUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
+            throw new YclientsException('deleteUserRecords() требует обязательный 2-ой или 3-й аргумент');
+            // trigger_error('deleteUserRecords() expected Argument 2 or Argument 3 required', E_USER_WARNING);
         }
 
-        return $this->request('user/records/' . $recordId . '/' . $recordHash, [], self::METHOD_DELETE,
-            $userToken ?: true);
+        return $this->request('user/records/' . $recordId . '/' . $recordHash, [], self::METHOD_DELETE, $userToken ?: true);
+    }
+
+    /**
+     * Получить список доступных сетей салонов
+     * @param string $userToken - Токен для авторизации пользователя, обязательный
+     * @return array
+     * @access public
+     * @see http://docs.yclients.apiary.io/#reference/33/0/0
+     * @throws YclientsException
+     */
+    public function getGroups($userToken)
+    {
+        return $this->request('groups', [], self::METHOD_GET, $userToken);
     }
 
     /**
@@ -505,7 +555,8 @@ class YclientsApi
         $userToken = null
     ) {
         if ($my && !$userToken) {
-            trigger_error('getCompanies() expected Argument 6 if set Argument 5', E_USER_WARNING);
+            throw new YclientsException('getCompanies() требует обязательный 6-ой аргумент, если установле 5-й аргумент');
+            // trigger_error('getCompanies() expected Argument 6 if set Argument 5', E_USER_WARNING);
         }
 
         $parameters = [];
@@ -607,7 +658,7 @@ class YclientsApi
      * @see http://docs.yclients.apiary.io/#reference/3/0/0
      * @throws YclientsException
      */
-    public function getServiceCategories($companyId, $categoryId, $staffId = null)
+    public function getServiceCategories($companyId, $categoryId = null, $staffId = null)
     {
         $parameters = [];
 
@@ -636,8 +687,7 @@ class YclientsApi
      */
     public function postServiceCategories($companyId, $categoryId, $fields, $userToken)
     {
-        return $this->request('service_categories/' . $companyId . '/' . $categoryId, $fields, self::METHOD_POST,
-            $userToken);
+        return $this->request('service_categories/' . $companyId . '/' . $categoryId, $fields, self::METHOD_POST, $userToken);
     }
 
     /**
@@ -672,8 +722,7 @@ class YclientsApi
      */
     public function putServiceCategory($companyId, $categoryId, $fields, $userToken)
     {
-        return $this->request('service_category/' . $companyId . '/' . $categoryId, $fields, self::METHOD_PUT,
-            $userToken);
+        return $this->request('service_category/' . $companyId . '/' . $categoryId, $fields, self::METHOD_PUT, $userToken);
     }
 
     /**
@@ -689,8 +738,7 @@ class YclientsApi
      */
     public function deleteServiceCategory($companyId, $categoryId, $userToken)
     {
-        return $this->request('service_category/' . $companyId . '/' . $categoryId, [], self::METHOD_DELETE,
-            $userToken);
+        return $this->request('service_category/' . $companyId . '/' . $categoryId, [], self::METHOD_DELETE, $userToken);
     }
 
     /**
@@ -937,7 +985,7 @@ class YclientsApi
      * @see http://docs.yclients.apiary.io/#reference/7/0/1
      * @throws YclientsException
      */
-    public function postClients($companyId, $name, $phone, $userToken, array $fields = null)
+    public function postClients($companyId, $name, $phone, $userToken, array $fields = [])
     {
         $parameters = [
             'name' => $name,
@@ -1235,6 +1283,24 @@ class YclientsApi
     }
 
     /**
+     * Получить расписание работы сотрудника
+     *
+     * @param integer $companyId - ID компании
+     * @param integer $staffId
+     * @param string $startDate
+     * @param string $endDate
+     * @param string $userToken - Токен для авторизации пользователя
+     * @return array
+     * @access public
+     * @see https://yclients.docs.apiary.io/#reference/12/1
+     * @throws YclientsException
+     */
+    public function getSchedule($companyId, $staffId, $startDate, $endDate, $userToken)
+    {
+        return $this->request('schedule/' . $companyId . '/' . $staffId . '/' . $startDate . '/'. $endDate, [], self::METHOD_GET, $userToken);
+    }
+
+    /**
      * Получить список дат для журнала
      *
      * @param integer $companyId - ID компании
@@ -1254,8 +1320,7 @@ class YclientsApi
             $parameters['staff_id'] = $staffId;
         }
 
-        return $this->request('timetable/dates/' . $companyId . '/' . $date->format('Y-m-d'), $parameters,
-            self::METHOD_GET, $userToken);
+        return $this->request('timetable/dates/' . $companyId . '/' . $date->format('Y-m-d'), $parameters, self::METHOD_GET, $userToken);
     }
 
     /**
@@ -1272,8 +1337,7 @@ class YclientsApi
      */
     public function getTimetableSeances($companyId, \DateTime $date, $staffId, $userToken)
     {
-        return $this->request('timetable/seances/' . $companyId . '/' . $staffId . '/' . $date->format('Y-m-d'), [],
-            self::METHOD_GET, $userToken);
+        return $this->request('timetable/seances/' . $companyId . '/' . $staffId . '/' . $date->format('Y-m-d'), [], self::METHOD_GET, $userToken);
     }
 
     /**
@@ -1413,96 +1477,12 @@ class YclientsApi
      */
     public function postHooks($companyId, $fields, $userToken)
     {
-        if (!isset($fields['url'])) {
-            throw new YclientsException('Не передан обязательный параметр url');
+        if (!isset($fields['urls'])) {
+            throw new YclientsException('Не передан обязательный параметр urls');
         }
         if (!isset($fields['active'])) {
             throw new YclientsException('Не передан обязательный параметр active');
         }
         return $this->request('hooks_settings/' . $companyId, $fields, self::METHOD_POST, $userToken);
-    }
-
-    /**
-     * Подготовка запроса
-     *
-     * @param string $url
-     * @param array $parameters
-     * @param string $method
-     * @param bool|string $auth - если true, то авторизация партнёрская
-     *                            если string, то авторизация пользовательская
-     * @return array
-     * @access protected
-     * @throws YclientsException
-     */
-    protected function request($url, $parameters = [], $method = 'GET', $auth = true)
-    {
-        $headers = ['Content-Type: application/json'];
-
-        if ($auth) {
-            if (!$this->tokenPartner) {
-                throw new YclientsException('Не указан токен партнёра');
-            }
-
-            $headers[] = 'Authorization: Bearer ' . $this->tokenPartner . (is_string($auth) ? ', User ' . $auth : '');
-        }
-
-        return $this->requestCurl($url, $parameters, $method, $headers);
-    }
-
-    /**
-     * Выполнение непосредственно запроса с помощью curl
-     *
-     * @param string $url
-     * @param array $parameters
-     * @param string $method
-     * @param array $headers
-     * @param integer $timeout
-     * @return array
-     * @access protected
-     * @throws YclientsException
-     */
-    protected function requestCurl($url, $parameters = [], $method = 'GET', $headers = [], $timeout = 30)
-    {
-        $ch = curl_init();
-
-        if (count($parameters)) {
-            if ($method === self::METHOD_GET) {
-                $url .= '?' . http_build_query($parameters);
-            } else {
-                curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($parameters));
-            }
-        }
-
-        if ($method === self::METHOD_POST) {
-            curl_setopt($ch, CURLOPT_POST, true);
-        } elseif ($method === self::METHOD_PUT) {
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, self::METHOD_PUT);
-        } elseif ($method === self::METHOD_DELETE) {
-            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, self::METHOD_DELETE);
-        }
-
-        curl_setopt($ch, CURLOPT_URL, self::URL . '/' . $url);
-        curl_setopt($ch, CURLOPT_FAILONERROR, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-        curl_setopt($ch, CURLOPT_HEADER, false);
-
-        if (count($headers)) {
-            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        }
-
-        $response = curl_exec($ch);
-
-        $errno = curl_errno($ch);
-        $error = curl_error($ch);
-        curl_close($ch);
-
-        if ($errno) {
-            throw new YclientsException('Запрос произвести не удалось: ' . $error, $errno);
-        }
-
-        return json_decode($response, true);
     }
 }
