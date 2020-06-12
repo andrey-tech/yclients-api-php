@@ -13,11 +13,6 @@
  * @see https://github.com/andrey-tech/amocrm-api-php
  * @license MIT
  *
- * @version 1.0.0
- *
- * v0.1.0 (27.05.2019) Оригинальная версия от Andrey Tyshev
- * v1.0.0 (27.05.2019) Изменен текст сообщения
- *
  */
 
 declare(strict_types = 1);

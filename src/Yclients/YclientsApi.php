@@ -13,7 +13,7 @@
  * @see https://github.com/andrey-tech/amocrm-api-php
  * @license MIT
  *
- * @version 1.5.0
+ * @version 1.6.0
  *
  * v0.1.0 (27.05.2019) Оригинальная версия от Andrey Tyshev
  * v1.0.0 (27.05.2019) Добавлено:
@@ -30,6 +30,7 @@
  *                     Параметр $throttle теперь число запросов в секунду.
  *                     Улучшены отладочные сообщения
  * v1.5.0 (12.06.2020) Добавлено логирование в файл или STDOUT
+ * v1.6.0 (12.06.2020) Добавлено свойство $limitCount
  *
  */
 
@@ -66,6 +67,7 @@ class YclientsApi
     protected $tokenPartner;
 
     /**
+     * Конструктор
      * @param string $tokenPartner
      * @return void
      * @access public
@@ -76,7 +78,7 @@ class YclientsApi
     }
 
     /**
-     * Утановка токена можно сделать отдельно т.к. есть запросы не
+     * Установку токена можно сделать отдельно т.к. есть запросы не
      * требующие авторизации партнёра
      *
      * @param string $tokenPartner

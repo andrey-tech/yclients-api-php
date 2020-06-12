@@ -13,24 +13,6 @@
  * @see https://github.com/andrey-tech/amocrm-api-php
  * @license MIT
  *
- * @version 1.5.0
- *
- * v0.1.0 (27.05.2019) Оригинальная версия от Andrey Tyshev
- * v1.0.0 (27.05.2019) Добавлено:
- *                     троттлинг обращений к API,
- *                     проверка SSL-сертификата сервера,
- *                     проверка сообщений об ошибках в ответе сервера,
- *                     вывод отладочной информации
- * v1.1.0 (09.08.2019) Добавлен вывод параметров запроса при ошибке
- * v1.2.0 (13.09.2019) Добавлен метод getSchedule()
- * v1.3.0 (21.02.2020) Добавлена проверка поля success: false в ответе сервера
- * v1.3.1 (31.03.2020) Исправлен метод postHooks() в связи с изменениями в API YClients
- * v1.4.0 (03.05.2020) Добавлен метод getGroups()
- * v1.4.1 (24.05.2020) Исправлен метод throttleCurl().
- *                     Параметр $throttle теперь число запросов в секунду.
- *                     Улучшены отладочные сообщения
- * v1.5.0 (12.06.2020) Добавлено логирование в файл или STDOUT
- *
  */
 
 declare(strict_types = 1);
@@ -76,6 +58,12 @@ trait YclientsRequest
      * @var integer
      */
     public $curlTimeout = 30;
+
+    /**
+     * Максимальное количество сушностей, загружаемых на один запрос в методе getAll()
+     * @var int
+     */
+    public $limitCount = 300;
 
     /**
      * Время последнего запроса к API
@@ -237,21 +225,21 @@ trait YclientsRequest
 
     /**
      * Загружает все сущности заданного типа
-     * @param  object $callback Функция для загрузки сущностей: $callback($page, $count)
+     * @param  object $callback Анонимная функция для загрузки сущностей: $callback($page, $count)
+     *                          $page - номер страницы, $count - число сущностей на странице
      * @return \Generator
      */
     public function getAll($callback) :\Generator
     {
         $page = 1;
-        $count = 300;
 
         while (true) {
-            $response = $callback($page, $count);
+            $response = $callback($page, $this->limitCount);
             $data = $response['data'];
           
             yield $response;
 
-            if (count($data) < $count) {
+            if (count($data) < $this->limitCount) {
                 break;
             }
 
