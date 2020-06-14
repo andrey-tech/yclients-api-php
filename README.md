@@ -20,6 +20,8 @@ c троттлингом запросов к API и логированием в 
 
 <!-- MarkdownTOC levels="1,2,3,4,5,6" autoanchor="true" autolink="true" -->
 
+- [Требования](#%D0%A2%D1%80%D0%B5%D0%B1%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F)
+- [Установка](#%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0)
 - [Класс `YclientsApi`](#%D0%9A%D0%BB%D0%B0%D1%81%D1%81-yclientsapi)
     - [Список методов класса](#%D0%A1%D0%BF%D0%B8%D1%81%D0%BE%D0%BA-%D0%BC%D0%B5%D1%82%D0%BE%D0%B4%D0%BE%D0%B2-%D0%BA%D0%BB%D0%B0%D1%81%D1%81%D0%B0)
         - [Авторизация](#%D0%90%D0%B2%D1%82%D0%BE%D1%80%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F)
@@ -47,6 +49,30 @@ c троттлингом запросов к API и логированием в 
 - [Лицензия](#%D0%9B%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F)
 
 <!-- /MarkdownTOC -->
+
+<a id="%D0%A2%D1%80%D0%B5%D0%B1%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F"></a>
+## Требования
+
+- PHP >= 7.0.
+- Произвольный автозагрузчик классов, реализующий стандарт [PSR-4](https://www.php-fig.org/psr/psr-4/).
+
+
+<a id="%D0%A3%D1%81%D1%82%D0%B0%D0%BD%D0%BE%D0%B2%D0%BA%D0%B0"></a>
+## Установка
+
+Установка через composer:
+```
+$ composer require andrey-tech/yclients-api-php:"~1.7"
+```
+
+или добавить
+
+```
+"andrey-tech/yclients-api-php": "~1.7"
+```
+
+в секцию require файла composer.json.
+
 
 <a id="%D0%9A%D0%BB%D0%B0%D1%81%D1%81-yclientsapi"></a>
 ## Класс `YclientsApi`
@@ -217,7 +243,8 @@ c троттлингом запросов к API и логированием в 
 `$throttle`             | 5              | Устанавливает максимальное число запросов к API YCLIENTS в секунду ([не более 5 запросов в секунду](https://yclients.docs.apiary.io/))
 `$verifySSLCerfificate` | true           | Включает проверку SSL/TLS-сертификата сервера YCLIENTS
 `$SSLCertificateFile`   | 'cacert.pem'   | Устанавливает файл SSL/TLS-сертификатов X.509 корневых удостоверяющих центров (CA) в формате РЕМ (null - файл, указанный в `curl.cainfo` php.ini)
-`$curlTimeout`          | 30             | Устанавливает таймаут соединения с сервером YCLIENTS, секунды
+`$curlConnectTimeout`   | 30             | Устанавливает таймаут соединения с сервером YCLIENTS, секунды
+`$curlTimeout`          | 30             | Устанавливает таймаут обмена данными с сервером YCLIENTS, секунды
 `$limitCount`           | 300            | Максимальное количество сушностей, загружаемых за один запрос к API в методе `getAll()`
 
 <a id="%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80%D1%8B"></a>

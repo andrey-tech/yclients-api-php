@@ -10,7 +10,7 @@
  *
  * @author    andrey-tech
  * @copyright 2019-2020 andrey-tech
- * @see https://github.com/andrey-tech/amocrm-api-php
+ * @see https://github.com/andrey-tech/yclients-api-php
  * @license MIT
  *
  */
@@ -54,7 +54,13 @@ trait YclientsRequest
     public $sslCertificateFile = 'cacert.pem';
 
     /**
-     * Таймаут соединения с сервером Yclients для сUrl, секунд
+     * Таймаут соединения с сервером Yclients, секунд
+     * @var integer
+     */
+    public $curlConnectTimeout = 30;
+
+    /**
+     * Таймаут обмена данными с сервером Yclients, секунд
      * @var integer
      */
     public $curlTimeout = 30;
@@ -159,6 +165,7 @@ trait YclientsRequest
         curl_setopt($ch, CURLOPT_FAILONERROR, false);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_TIMEOUT, $this->curlTimeout);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->curlConnectTimeout);
         curl_setopt($ch, CURLOPT_HEADER, false);
 
         // Включение проверки SSL-сертификата сервера YClients

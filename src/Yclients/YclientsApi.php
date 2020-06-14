@@ -10,10 +10,10 @@
  *
  * @author    andrey-tech
  * @copyright 2019-2020 andrey-tech
- * @see https://github.com/andrey-tech/amocrm-api-php
+ * @see https://github.com/andrey-tech/yclients-api-php
  * @license MIT
  *
- * @version 1.6.0
+ * @version 1.7.0
  *
  * v0.1.0 (27.05.2019) Оригинальная версия от Andrey Tyshev
  * v1.0.0 (27.05.2019) Добавлено:
@@ -31,6 +31,7 @@
  *                     Улучшены отладочные сообщения
  * v1.5.0 (12.06.2020) Добавлено логирование в файл или STDOUT
  * v1.6.0 (12.06.2020) Добавлено свойство $limitCount
+ * v1.7.0 (14.06.2020) Добавлено свойство $curlConnectTimeout
  *
  */
 

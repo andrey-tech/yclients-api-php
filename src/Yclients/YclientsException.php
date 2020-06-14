@@ -10,7 +10,7 @@
  *
  * @author    andrey-tech
  * @copyright 2019-2020 andrey-tech
- * @see https://github.com/andrey-tech/amocrm-api-php
+ * @see https://github.com/andrey-tech/yclients-api-php
  * @license MIT
  *
  */
