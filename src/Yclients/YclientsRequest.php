@@ -103,7 +103,7 @@ trait YclientsRequest
      */
     public function request($url, $parameters = [], $method = 'GET', $auth = true)
     {
-        $headers = [ 'Content-Type: application/json' ];
+        $headers = [ 'Content-Type: application/json', 'Accept: application/vnd.api.v2+json' ];
 
         if ($auth) {
             if (!$this->tokenPartner) {
