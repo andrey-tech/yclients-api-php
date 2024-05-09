@@ -536,6 +536,43 @@ class YclientsApi
     }
 
     /**
+     * Получить основные показатели компании.
+     *
+     * @param string $companyId Идентификатор компании, обязательный.
+     * @param string $dateFrom Дата начала анализируемого периода, обязательный.
+     * @param string $dateTo Дата окончания анализируемого периода (включается в отчет), обязательный.
+     * @param string $userToken Токен для авторизации пользователя, обязательный.
+     *
+     * @return array
+     *
+     * @see https://developers.yclients.com/ru/#tag/Analitika/paths/~1company~1%7Bcompany_id%7D~1analytics~1overall~1/get
+     *
+     * @throws YclientsException
+     */
+    public function getCompanyAnalytics($companyId, $dateFrom, $dateTo, $userToken)
+    {
+        if (!$companyId) {
+            throw new YclientsException('getAnalytics() требует ID компании');
+        }
+
+        if (empty($userToken)) {
+            throw new YclientsException('getAnalytics() требует авторизации по токену пользователя');
+        }
+
+        $parameters = [
+            'date_from' => $dateFrom,
+            'date_to' => $dateTo,
+        ];
+
+        return $this->request(
+            sprintf('company/%s/analytics/overall/', $companyId),
+            $parameters,
+            self::METHOD_GET,
+            $userToken
+        );
+    }
+
+    /**
      * Получить список компаний
      *
      * @param integer $groupId - ID сети компаний

@@ -35,7 +35,7 @@ trait YclientsRequest
     public $debugLogFile = 'logs/debug.log';
 
     /**
-     * Максимальное число запросов к API в секунду (не более 5!)
+     * Максимальное число запросов к API в секунду (не более 5). Значение 0 отключает троттлинг запросов к API
      * @var float
      */
     public $throttle = 5;
@@ -105,7 +105,7 @@ trait YclientsRequest
     {
         $headers = [
             'Content-Type: application/json',
-            'Accept: application/vnd.yclients.v2+json'
+            'Accept: application/vnd.yclients.v2+json',
         ];
 
         if ($auth) {
@@ -264,17 +264,19 @@ trait YclientsRequest
      */
     protected function throttleCurl($curl)
     {
-        do {
-            $usleep = (int) (1E6 * ($this->lastRequestTime + 1/$this->throttle - microtime(true)));
-            if ($usleep <= 0) {
-                break;
-            }
+        if ($this->throttle > 0) {
+            do {
+                $usleep = (int) (1E6 * ($this->lastRequestTime + 1/$this->throttle - microtime(true)));
+                if ($usleep <= 0) {
+                    break;
+                }
 
-            $throttleTime = sprintf('%0.4f', $usleep/1E6);
-            $this->debug("[{$this->requestCounter}] ++++ THROTTLE ({$this->throttle}) {$throttleTime}s");
+                $throttleTime = sprintf('%0.4f', $usleep/1E6);
+                $this->debug("[{$this->requestCounter}] ++++ THROTTLE ({$this->throttle}) {$throttleTime}s");
 
-            usleep($usleep);
-        } while (false);
+                usleep($usleep);
+            } while (false);
+        }
 
         $this->lastRequestTime = microtime(true);
 
@@ -346,7 +348,7 @@ trait YclientsRequest
         }
 
         // Создаем новый каталог рекурсивно
-        if (! mkdir($directory, $mode = 0755, $recursive = true)) {
+        if (!mkdir($directory, $mode = 0755, $recursive = true) && !is_dir($directory)) {
             throw new YclientsException("Не удалось рекурсивно создать каталог {$directory}");
         }
     }
