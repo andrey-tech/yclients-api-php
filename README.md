@@ -367,7 +367,7 @@ try {
 ## Авторы
 
 © 2018 slowprog  
-© 2019-2024 andrey-tech
+© 2019-2026 andrey-tech
 
 <a id="%D0%9B%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F"></a>
 ## Лицензия
